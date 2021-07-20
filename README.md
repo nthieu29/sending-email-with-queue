@@ -96,9 +96,6 @@ That's all.
   - Web Management UI: http://localhost:5080/
 
 ## References
-
-- [Designing a microservices architecture](https://docs.microsoft.com/en-us/azure/architecture/microservices/design/)
-  - *Azure Architecture Center | Microsoft Docs*
 - [Cloud design patterns](https://docs.microsoft.com/en-us/azure/architecture/patterns/) - *Azure Architecture Center |
   Microsoft Docs*
 
