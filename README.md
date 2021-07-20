@@ -11,16 +11,21 @@ There are 2 issues:
 
 - **Un-scalable**: If a large number of instances of the web app run concurrently, the data store might be unable to
   respond to requests quickly enough, causing requests to time out, be throttled, or otherwise fail.
+  
   ![Unscalable issue](images/unscalable_issue.png)
+  
 - **Not resilient**: If the SMTP Server was down, the web app cannot send out the emails. It does not have the ability
   to re-send the emails when the SMTP Server recovered and up again, so we will lose the emails in the downtime period
   of SMTP Server.
+  
   ![SMTP Server Down issue](images/smtp_server_down.png)
+  
 
 ## Solution
 
 Refactor the solution and introduce a queue and a worker (a service which works as a subscriber to the queue) between
 the web app and the SMTP Server.
+
 ![Email Sending Architecture](images/email_sending_architecture.png)
 
 - The web app (**email-service**) posts a message containing the data required for sending email to a queue.
@@ -52,6 +57,7 @@ This solution provides the following benefits:
 ## Sample implementation
 
 ![Sample implementation](images/implementation.png)
+
 Those above components are provided in this repository as following:
 
 - **Email-Service** is built with Spring Boot, it exposes the API endpoint for sending out the email. When the user
