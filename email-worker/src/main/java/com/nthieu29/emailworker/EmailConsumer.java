@@ -1,18 +1,18 @@
 package com.nthieu29.emailworker;
 
-import com.rabbitmq.client.Channel;
+import com.azure.spring.integration.core.api.Checkpointer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.Message;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.util.function.Consumer;
 
-@EnableBinding(Sink.class)
+import static com.azure.spring.integration.core.AzureHeaders.CHECKPOINTER;
+
+@Component
 @Slf4j
 public class EmailConsumer {
 
@@ -23,12 +23,19 @@ public class EmailConsumer {
         this.javaMailSender = javaMailSender;
     }
 
-    @StreamListener(Sink.INPUT)
-    public void processEmail(Email email,
-                             @Header(AmqpHeaders.CHANNEL) Channel channel,
-                             @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
-        log.info("Get the email: " + email);
-        javaMailSender.send(email.toSimpleMailMessage());
-        channel.basicAck(deliveryTag, false);
+    @Bean
+    public Consumer<Message<Email>> consume() {
+        return emailMessage -> {
+            Checkpointer checkpointer = (Checkpointer) emailMessage.getHeaders().get(CHECKPOINTER);
+            Email email = emailMessage.getPayload();
+            log.info("Get the email: " + email);
+            javaMailSender.send(email.toSimpleMailMessage());
+            checkpointer.success().handle((r, ex) -> {
+                if (ex == null) {
+                    log.info("Email '{}' successfully checkpointed", email);
+                }
+                return null;
+            });
+        };
     }
 }
