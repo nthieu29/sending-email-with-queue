@@ -51,8 +51,7 @@ This solution provides the following benefits:
   after SMTP Server failure and back to normal.
   - In the case connection to SMTP Server is intermittent (server down in the very short period, connection timeout),
     the worker could easily retry.
-  - In the case the SMTP Server is down for a long time, the user could move the message from the dead queue to the
-    normal queue, then the worker could process as normal.
+  - In the case the SMTP Server is down for a long time and then it backs to normal, all the messages in the downtime period will be stored in the dead queue, the user could easily move the messages from the dead queue to the normal queue, then the worker could process as normal.
 
 ## Sample implementation
 
@@ -80,8 +79,7 @@ The setup development workspace process is simpler than ever with following step
 1. Install [Docker for Desktop](https://www.docker.com/products/docker-desktop).
 1. Install [Maven](https://maven.apache.org/download.cgi?Preferred=ftp://mirror.reverse.net/pub/apache/).
 1. Clone this project to your local machine.
-1. Open terminal and make sure you're at the root directory of this project, run the command ```docker-compose up``` (
-   this will automatically setup RabbitMQ and a fake SMTP Server for you).
+1. Open terminal and make sure you're at the root directory of this project, run the command ```docker-compose up``` (this will automatically setup RabbitMQ and a fake SMTP Server for you).
 
 That's all.
 
