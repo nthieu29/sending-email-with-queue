@@ -30,15 +30,14 @@ the web app and the SMTP Server.
 
 - The web app (**email-service**) posts a message containing the data required for sending email to a queue.
 - The **queue** acts as a buffer, storing the message until it's retrieved by the worker.
-  - We don't want data will not be lost if the worker was temporary down, so we config queue as durable queue for
-    guaranteed message delivery.
 - The worker (**email-worker**) retrieves the messages from the queue and processes them by calling SMTP Server for
   sending out the email.
-  - If worker processes the message successfully (the email was sent successfully), the worker sends acknowledgement (
-    ack) to the queue, then the queue will delete that message.
+  - If worker processes the message successfully (the email was sent successfully), the worker sends acknowledgement (ack) to the queue, then the queue will delete that message.
   - If worker dies (or SMTP Server was timeout...) without sending an ack, the queue will understand that a message
     wasn't processed fully and will re-queue it. We could configure the maximum number of re-queue times.
   - If the message exceeds the maximum of re-queue times, it will be sent to dead queue.
+    - We could check the message in the dead queue to find out why the message could not be processed successfully.
+    - In the case we would like to re-queue these messages again, we could simply move these message from the dead queue to the normal queue.
 
 This solution provides the following benefits:
 
