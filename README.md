@@ -54,7 +54,7 @@ This solution provides the following benefits:
 
 ## Sample implementation
 
-![Sample implementation](images/implementation.png)
+![Sample implementation](images/rabbitmq_implementation.png)
 
 Those above components are provided in this repository as following:
 
