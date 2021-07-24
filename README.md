@@ -50,22 +50,34 @@ This solution provides the following benefits:
   after SMTP Server failure and back to normal.
   - In the case connection to SMTP Server is intermittent (server down in the very short period, connection timeout),
     the worker could easily retry.
-  - In the case the SMTP Server is down for a long time and then it backs to normal, all the messages in the downtime period will be stored in the dead queue, the user could easily move the messages from the dead queue to the normal queue, then the worker could process as normal.
+  - In the case the SMTP Server is down for a long time and then it backs to normal, all the messages in the downtime
+    period will be stored in the dead queue, the user could easily move the messages from the dead queue to the normal
+    queue, then the worker could process as normal.
 
 ## Sample implementation
 
-![Sample implementation](images/rabbitmq_implementation.png)
+In this repository, we provide 2 sample implementation for 2 queue services:
+
+- [RabbitMQ](https://www.rabbitmq.com/): **main** branch
+  ![Sample implementation](images/rabbitmq_implementation.png)
+- [Azure Service Bus](https://azure.microsoft.com/en-us/services/service-bus/): **azure-service-bus** branch
+  ![Sample implementation](images/azure-service-bus_implementation.png)
 
 Those above components are provided in this repository as following:
 
 - **Email-Service** is built with Spring Boot, it exposes the API endpoint for sending out the email. When the user
-  called this API, it will send the message to RabbitMQ.
-- **Email-Worker** is built with Spring Boot, it subscribes to the RabbitMQ to get the message, extract the info from
-  the message to create the email to send to SMTP Server.
-- Queue: we use [RabbitMQ](https://www.rabbitmq.com/) as Docker container. There is a cloud service of RabbitMQ
-  is [CloudAMQP](https://www.cloudamqp.com/) (there is free plan for development also). You're free to choose the
-  message broker that meet your need.
-- SMTP Server: we use [fake SMTP Server](https://github.com/gessnerfl/fake-smtp-server) as Docker container.
+  called this API, it will send the message to the queue.
+- **Email-Worker** is built with Spring Boot, it subscribes to the queue to get the message, extract the info from the
+  message to create the email to send to SMTP Server.
+- **Queue**:
+  - **RabbitMQ**: you could use the local RabbitMQ which is provided as Docker container in docker-compose in this
+    repository. Or you could use a cloud service of RabbitMQ - [CloudAMQP](https://www.cloudamqp.com/) (there is free
+    plan for development also).
+  - **Azure Service Bus**: you need to input your correct connection string to your Azure Service Bus in the file
+    _application.properties_. Follow steps
+    in [Azure Documentation](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal)
+    to create a Service Bus queue and get the connection string.
+- **SMTP Server**: we use [fake SMTP Server](https://github.com/gessnerfl/fake-smtp-server) as Docker container.
 
 Note: **RabbitMQ** and **SMTP Server** are provided as _docker-compose_ in this repository. Both RabbitMQ and fake SMTP
 Server have the Web Management UI so that you could easily see what happened in RabbitMQ and SMTP Server.
@@ -84,18 +96,18 @@ That's all.
 
 ## Application default configuration and endpoints
 
-- Email-service:
+- **Email-service**:
   - Default port: 8081
   - API Endpoint for sending out email: http://localhost:8081/emails (POST)
   - Swagger UI: http://localhost:8081/swagger-ui/index.html
 
-- Email-worker:
+- **Email-worker**:
   - Default port: 8082
 
-- RabbitMQ:
+- **RabbitMQ**:
   - Web Management UI: http://localhost:15672/ (login with **guest**:**guest**)
 
-- Fake SMTP Server:
+- **Fake SMTP Server**:
   - Web Management UI: http://localhost:5080/
 
 ## References
